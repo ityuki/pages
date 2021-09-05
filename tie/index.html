@@ -753,7 +753,8 @@
     ctx.drawImage(simg,0,0)
     var fontsz = Math.floor(parseInt($("#" + tie_data[id].text_area_id).css('font-size')) * d)
     var font = $("#" + tie_data[id].text_area_id).css('font-size').replace(/^[0-9]+/,'')
-    ctx.font = "" + fontsz + font + ' sans-serif'
+    var fontf = $("#" + tie_data[id].text_area_id).css('font-family')
+    ctx.font = "" + fontsz + font + ' ' + fontf
     ctx.textAlign = 'start'
     ctx.textBaseline = 'top'
     ctx.beginPath()
