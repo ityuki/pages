@@ -147,11 +147,11 @@
     <a href="#" onclick="tie_text_cancel()" title="文字入力をキャンセルします"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg></a>
   </div>
   <div id="tie_text_tools_font" class="d-none bg-info" style="position: absolute;">
-    <div class="list-group" id="tie_text_tools_font_list">
-      <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
-        The current link item
-      </a>
-      <a href="#" class="list-group-item list-group-item-action">A second link item</a>
+    <div class="form-group">
+      <label for="tie_text_tools_font_title">フォント</label>
+      <select class="form-control" size=3 id="tie_text_tools_font_list" onchange="tie_text_font_set('')" >
+
+      </select>
     </div>
   </div>
 <script>
@@ -691,33 +691,47 @@
     $("#" + tie_data[id].text_area_id).css('font-size',csize)
   }
   function tie_text_font_change(){
-    var flist = $("#tie_text_tools_font_list")
-    flist.innerHTML = "";
-    var currentFont = "";
-    var html = ""
-    html += '<a href="#" class="list-group-item list-group-item-action active" onclick="tie_text_font_set(\'\')">フォントを変更しない</a>'
-    for(var i=0;i<fontfamily_list.length;i++){
-      var name = fontfamily_list[i].name
-      html += '<a href="#" class="list-group-item list-group-item-action" onclick="tie_text_font_set(\'' + name + '\')">' + name + '</a>'
-    }
-    flist.innerHTML = html
     var id = $("#tie_id").val()
     if (id == ""){
       return
     }
+    if (!$("#tie_text_tools_font").hasClass("d-none")){
+      $("#tie_text_tools_font").addClass("d-none")
+      return
+    }
+    var flist = $("#tie_text_tools_font_list")[0]
+    flist.innerHTML = "";
+    var currentFont = $("#" + tie_data[id].text_area_id).css('font-family');
+    var html = ""
+    html += '<option value="' + currentFont + '">' + currentFont + ' (現在のフォント)</option>'
+    for(var i=0;i<fontfamily_list.length;i++){
+      var name = fontfamily_list[i].name
+      html += '<option>' + name + '</option>'
+    }
+    flist.innerHTML = html
     $("#tie_text_tools_font")[0].style.left = $("#" + tie_data[id].text_tool_id)[0].style.left
-    $("#tie_text_tools_font")[0].style.top = $("#" + tie_data[id].text_tool_id)[0].style.top + $("#" + tie_data[id].text_tool_id)[0].style.height + 1
+    $("#tie_text_tools_font")[0].style.top = parseInt($("#" + tie_data[id].text_tool_id)[0].style.top.replace("px","")) + parseInt($("#" + tie_data[id].text_tool_id).outerHeight(true)) + "px"
     $("#tie_text_tools_font").removeClass("d-none")
+  }
+  function tie_text_font_set_and_exit(){
+    tie_text_font_set('')
+    $("#tie_text_tools_font").addClass("d-none")
   }
   function tie_text_font_set(fontname){
     var id = $("#tie_id").val()
     if (id == ""){
       return
     }
+    if (fontname == ""){
+      fontname = $("#tie_text_tools_font_list").val()
+    }
     if (fontname != ""){
       $("#" + tie_data[id].text_area_id).css('font-family',fontname)
     }
-    $("#tie_text_tools_font").addClass("d-none")
+    // Hahaha!
+    setTimeout(function(){
+      $("#tie_text_tools_font_list")[0].focus()
+    },100);
   }
   function tie_text_write(color){
     var id = $("#tie_id").val()
@@ -773,6 +787,9 @@
     $("#tie_id").val("")
     if (!$("#tie_menu").hasClass("d-none")){
       $("#tie_menu").addClass("d-none")
+    }
+    if (!$("#tie_text_tools_font").hasClass("d-none")){
+      $("#tie_text_tools_font").addClass("d-none")
     }
     if (id != ""){
       if (tie_data[id] != null){
