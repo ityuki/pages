@@ -1989,17 +1989,17 @@ if (typeof exports === 'object') {
 
     function appendDefaultFilenameToHash () {
         var newHashString = '';
-        var currentHashString = window.location.hash ||憎'';
+        var currentHashString = window.location.hash || '';
         if (currentHashString === '' ||
             currentHashString === '#'||
             currentHashString === '#!')
         {
-            newHashString = '#!readme.md';
+            newHashString = '#!index.md';
         }
         else if (currentHashString.startsWith ('#!') &&
                  currentHashString.endsWith('/')
                 ) {
-            newHashString = currentHashString + 'readme.md';
+            newHashString = currentHashString + 'index.md';
         }
         if (newHashString)
             window.location.hash = newHashString;
@@ -3092,7 +3092,7 @@ if (typeof exports === 'object') {
 		var filename = window.location.hash;
 
 		if (filename.length === 0) {
-            filename = '#!readme.md';
+            filename = '#!index.md';
         }
 		var selector = 'li:has(a[href="' + filename + '"])';
 		$('#md-menu').find (selector).addClass ('active');
@@ -3282,7 +3282,7 @@ if (typeof exports === 'object') {
     // picks out the paragraphs that start with a trigger word
     function select_paragraphs() {
         var note = ['note', 'beachte' ];
-        var warning = [ 'achtung', 'attention', 'warnung', 'warning', 'atenci坦n', 'guarda', 'advertimiento' ];
+        var warning = [ 'achtung', 'attention', 'warnung', 'warning', 'atención', 'guarda', 'advertimiento' ];
         var hint = ['hint', 'tipp', 'tip', 'hinweis'];
         var exp = note.concat(warning);
         exp = exp.concat(hint);
@@ -3481,7 +3481,7 @@ if (typeof exports === 'object') {
     var language = window.navigator.userLanguage || window.navigator.language;
     var code = language + "_" + language.toUpperCase();
     var fbRootDiv = $('<div id="fb-root" />');
-    var fbScriptHref = $.md.prepareLink ('connect.facebook.net/' + code + '/all.js#xfbml=1', {憎forceHTTP: true });
+    var fbScriptHref = $.md.prepareLink ('connect.facebook.net/' + code + '/all.js#xfbml=1', { forceHTTP: true });
     var fbscript ='(function(d, s, id) { var js, fjs = d.getElementsByTagName(s)[0]; if (d.getElementById(id)) return; js = d.createElement(s); js.id = id; js.src = "' + fbScriptHref + '"; fjs.parentNode.insertBefore(js, fjs);}(document, "script", "facebook-jssdk"));';
 
     var facebookLikeGimmick = {
@@ -4242,8 +4242,8 @@ function googlemapsReady() {
 
             title = (title ? title : '');
 
-            /* `FOOBAR卒 => (FOOBAR) */
-            data = data.replace( new RegExp('`', 'g'), '(' ).replace( new RegExp('卒', 'g'), ')' );
+            /* `FOOBAR´ => (FOOBAR) */
+            data = data.replace( new RegExp('`', 'g'), '(' ).replace( new RegExp('´', 'g'), ')' );
 
             url += options.style + ';dir:' + options.direction + ';scale:' + options.scale + '/' + options.type + '/' + data;
 
