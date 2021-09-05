@@ -8,7 +8,7 @@
    See http://github.com/Dynalon/mdwiki for a copy of the source code.
 -->
 <head>
-    <title>github pages - ityuki</title>
+    <title>MDwiki</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="fragment" content="!">
     <link rel="shortcut icon" type="image/x-icon" href="favicon.png" />
@@ -942,10 +942,10 @@ InlineLexer.prototype.outputLink = function(cap, link) {
 InlineLexer.prototype.smartypants = function(text) {
   if (!this.options.smartypants) return text;
   return text
-    .replace(/--/g, '痿・)
-    .replace(/'([^']*)'/g, '痿・1痿・)
-    .replace(/"([^"]*)"/g, '痿・1痿・)
-    .replace(/\.{3}/g, '痿Η);
+    .replace(/--/g, '—')
+    .replace(/'([^']*)'/g, '‘$1’')
+    .replace(/"([^"]*)"/g, '“$1”')
+    .replace(/\.{3}/g, '…');
 };
 
 /**
