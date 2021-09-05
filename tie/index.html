@@ -1,0 +1,1380 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8"/>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Tiny Image Editer</title>
+<script src="js/jquery-3.4.1.js"></script>
+<script src="js/paste.js"></script>
+
+<link rel="stylesheet" href="css/bootstrap.min.css">
+<link rel="stylesheet" href="css/bootstrap-reboot.min.css">
+<link rel="stylesheet" href="css/bootstrap-grid.min.css">
+<script src="js/bootstrap.bundle.min.js"></script>
+
+<link rel="stylesheet" href="css/pickr-nano.min.css">
+<script src="js/pickr.min.js"></script>
+<script src="js/pickr.es5.min.js"></script>
+
+</head>
+<body>
+  <div id="tie_dragframe" style="background-color:#b8deff;border:solid 1px #3470ff;">drag&drop image file this area / or Paste from clipboard</div>
+  <div id="tie_menu" class="d-none bg-info" style="position: absolute;">
+    <input type="hidden" id="tie_id">
+    <!-- cut image -->
+    <a href="#" onclick="tie_cut_image()" id="tie_menu_cut_image" title="選択部分を切り出してあたらしい画像を生成します"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M17 15h2V7c0-1.1-.9-2-2-2H9v2h8v8zM7 17V1H5v4H1v2h4v10c0 1.1.9 2 2 2h10v4h2v-4h4v-2H7z"/></svg></a>
+    &nbsp;
+    <!-- pen write red -->
+    <a href="#" onclick="tie_pen(2,$('#tie_pickr_button').css('background-color'))" title=線を書きます"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/></svg></a>
+    &nbsp;
+    <!-- bold pen write red -->
+    <a href="#" onclick="tie_pen(4,$('#tie_pickr_button').css('background-color'))" title="太い線を書きます"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 14c-1.66 0-3 1.34-3 3 0 1.31-1.16 2-2 2 .92 1.22 2.49 2 4 2 2.21 0 4-1.79 4-4 0-1.66-1.34-3-3-3zm13.71-9.37l-1.34-1.34c-.39-.39-1.02-.39-1.41 0L9 12.25 11.75 15l8.96-8.96c.39-.39.39-1.02 0-1.41z"/></svg></a>
+    &nbsp;
+    <!-- super bold pen write red -->
+    <a href="#" onclick="tie_pen(8,$('#tie_pickr_button').css('background-color'))" title="とても太い線を書きます"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path transform="rotate(180,12,12)" d="M18 4V3c0-.55-.45-1-1-1H5c-.55 0-1 .45-1 1v4c0 .55.45 1 1 1h12c.55 0 1-.45 1-1V6h1v4H9v11c0 .55.45 1 1 1h2c.55 0 1-.45 1-1v-9h8V4h-3z"/></svg></a>
+    &nbsp;
+    <!-- Concentrated line -->
+    <a href="#" onclick="tie_circle_rand_line(50,$('#tie_pickr_button').css('background-color'))" title="選択範囲に対して集中線を書きます"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M15.54 5.54L13.77 7.3 12 5.54 10.23 7.3 8.46 5.54 12 2zm2.92 10l-1.76-1.77L18.46 12l-1.76-1.77 1.76-1.77L22 12zm-10 2.92l1.77-1.76L12 18.46l1.77-1.76 1.77 1.76L12 22zm-2.92-10l1.76 1.77L5.54 12l1.76 1.77-1.76 1.77L2 12z"/><circle cx="12" cy="12" r="3"/></svg></a>
+    &nbsp;
+    <!-- large Concentrated line -->
+    <a href="#" onclick="tie_circle_rand_line(300,$('#tie_pickr_button').css('background-color'))" title="選択範囲に対して集中線をたくさん書きます"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M7 11H1v2h6v-2zm2.17-3.24L7.05 5.64 5.64 7.05l2.12 2.12 1.41-1.41zM13 1h-2v6h2V1zm5.36 6.05l-1.41-1.41-2.12 2.12 1.41 1.41 2.12-2.12zM17 11v2h6v-2h-6zm-5-2c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3zm2.83 7.24l2.12 2.12 1.41-1.41-2.12-2.12-1.41 1.41zm-9.19.71l1.41 1.41 2.12-2.12-1.41-1.41-2.12 2.12zM11 23h2v-6h-2v6z"/></svg></a>
+    &nbsp;
+    <!-- fill area to black-->
+    <a href="#" onclick="tie_fill($('#tie_pickr_button').css('background-color'))" title="選択範囲を塗りつぶします"><svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><rect fill="none" height="24" width="24"/><path d="M16.56,8.94L7.62,0L6.21,1.41l2.38,2.38L3.44,8.94c-0.59,0.59-0.59,1.54,0,2.12l5.5,5.5C9.23,16.85,9.62,17,10,17 s0.77-0.15,1.06-0.44l5.5-5.5C17.15,10.48,17.15,9.53,16.56,8.94z M5.21,10L10,5.21L14.79,10H5.21z M19,11.5c0,0-2,2.17-2,3.5 c0,1.1,0.9,2,2,2s2-0.9,2-2C21,13.67,19,11.5,19,11.5z M2,20h20v4H2V20z"/></svg></a>
+    &nbsp;
+    <!-- mosaic -->
+    <a href="#" onclick="tie_area_mosaic(16)" title="選択範囲にモザイクをかけます"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-4h4v4zm0-6H4v-4h4v4zm0-6H4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4z"/></svg></a>
+    &nbsp;
+    <!-- blur -->
+    <a href="#" onclick="tie_area_blur(23)" title="選択範囲をぼかします"><svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24" x="0"/></g><g><g><g><path d="M9,11.24V7.5C9,6.12,10.12,5,11.5,5S14,6.12,14,7.5v3.74c1.21-0.81,2-2.18,2-3.74C16,5.01,13.99,3,11.5,3S7,5.01,7,7.5 C7,9.06,7.79,10.43,9,11.24z M18.84,15.87l-4.54-2.26c-0.17-0.07-0.35-0.11-0.54-0.11H13v-6C13,6.67,12.33,6,11.5,6 S10,6.67,10,7.5v10.74c-3.6-0.76-3.54-0.75-3.67-0.75c-0.31,0-0.59,0.13-0.79,0.33l-0.79,0.8l4.94,4.94 C9.96,23.83,10.34,24,10.75,24h6.79c0.75,0,1.33-0.55,1.44-1.28l0.75-5.27c0.01-0.07,0.02-0.14,0.02-0.2 C19.75,16.63,19.37,16.09,18.84,15.87z"/></g></g></g></svg></a>
+    &nbsp;
+    <!-- input text -->
+    <a href="#" onclick="tie_write_text('tie_text_box','tie_text_tools')" title="文字を入力します"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M5 17v2h14v-2H5zm4.5-4.2h5l.9 2.2h2.1L12.75 4h-1.5L6.5 15h2.1l.9-2.2zM12 5.98L13.87 11h-3.74L12 5.98z"/></svg></a>
+    &nbsp;
+    <!-- cancel -->
+    <a href="#" onclick="tie_cancel()" title="操作をキャンセルします"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg></a>
+  </div>
+  <div id="tie_menu_list" class="bg-info">
+    <!-- file -->
+    <a href="#" onclick="tie_inputfile()" title="ファイルを選択します"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/></svg></a>
+    <input type="file" id="tie_file" class="d-none" accept=".jpg,.jpeg,.png">
+    &nbsp;
+    <!-- undo -->
+    <a href="#" onclick="tie_undo('tie_view_image')" title="操作を一段階戻します"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg></a>
+    &nbsp;
+    <!-- redo -->
+    <a href="#" onclick="tie_redo('tie_view_image')" title="戻した操作をもう一度実行します"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M18.4 10.6C16.55 8.99 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg></a>
+    &nbsp;
+    <!-- rotate 90 -->
+    <a href="#" onclick="tie_rotate90('tie_view_image')" title="画像を９０度回転します"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 4V1L8 5l4 4V6c3.31 0 6 2.69 6 6 0 1.01-.25 1.97-.7 2.8l1.46 1.46C19.54 15.03 20 13.57 20 12c0-4.42-3.58-8-8-8zm0 14c-3.31 0-6-2.69-6-6 0-1.01.25-1.97.7-2.8L5.24 7.74C4.46 8.97 4 10.43 4 12c0 4.42 3.58 8 8 8v3l4-4-4-4v3z"/></svg></a>
+    &nbsp;
+    <!-- LR swap -->
+    <a href="#" onclick="tie_lr_swap('tie_view_image')" title="左右反転します"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M6.99 11L3 15l3.99 4v-3H14v-2H6.99v-3zM21 9l-3.99-4v3H10v2h7.01v3L21 9z"/></svg></a>
+    &nbsp;
+    <!-- TD swap -->
+    <a href="#" onclick="tie_td_swap('tie_view_image')" title="上下反転します"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 17.01V10h-2v7.01h-3L15 21l4-3.99h-3zM9 3L5 6.99h3V14h2V6.99h3L9 3z"/></svg></a>
+    &nbsp;
+    <!-- mosaic -->
+    <a href="#" onclick="tie_effect_mosaic('tie_view_image',8)" title="モザイクをかけます"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20 2H4c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM8 20H4v-4h4v4zm0-6H4v-4h4v4zm0-6H4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4zm6 12h-4v-4h4v4zm0-6h-4v-4h4v4zm0-6h-4V4h4v4z"/></svg></a>
+    &nbsp;
+    <!-- grayscale -->
+    <a href="#" onclick="tie_effect_grayscale('tie_view_image')" title="グレースケールにします"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M11 9h2v2h-2zm-2 2h2v2H9zm4 0h2v2h-2zm2-2h2v2h-2zM7 9h2v2H7zm12-6H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 18H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm2-7h-2v2h2v2h-2v-2h-2v2h-2v-2h-2v2H9v-2H7v2H5v-2h2v-2H5V5h14v6z"/></svg></a>
+    &nbsp;
+    <!-- sepia -->
+    <a href="#" onclick="tie_effect_sepia('tie_view_image')" title="セピア調にします"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M9.4 10.5l4.77-8.26C13.47 2.09 12.75 2 12 2c-2.4 0-4.6.85-6.32 2.25l3.66 6.35.06-.1zM21.54 9c-.92-2.92-3.15-5.26-6-6.34L11.88 9h9.66zm.26 1h-7.49l.29.5 4.76 8.25C21 16.97 22 14.61 22 12c0-.69-.07-1.35-.2-2zM8.54 12l-3.9-6.75C3.01 7.03 2 9.39 2 12c0 .69.07 1.35.2 2h7.49l-1.15-2zm-6.08 3c.92 2.92 3.15 5.26 6 6.34L12.12 15H2.46zm11.27 0l-3.9 6.76c.7.15 1.42.24 2.17.24 2.4 0 4.6-.85 6.32-2.25l-3.66-6.35-.93 1.6z"/></svg></a>
+    &nbsp;
+    <!-- resize * 2 -->
+    <a href="#" onclick="tie_resize('tie_view_image',2)" title="２倍に拡大します"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/><path d="M12 10h-2v2H9v-2H7V9h2V7h1v2h2v1z"/></svg></a>
+    &nbsp;
+    <!-- resize / 2 -->
+    <a href="#" onclick="tie_resize('tie_view_image',0.5)" title="半分のサイズにします"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14zM7 9h5v1H7z"/></svg></a>
+    &nbsp;
+    <!-- resize width: 800 -->
+    <a href="#" onclick="tie_resize_width('tie_view_image',800)" title="横幅が最大800になるようにサイズを変えます"><svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/></g><g transform="rotate(90,12,12)"><g/><polygon points="13,6.99 16,6.99 12,3 8,6.99 11,6.99 11,17.01 8,17.01 12,21 16,17.01 13,17.01"/></g></svg></a>
+    &nbsp;
+    <!-- resize height: 300 -->
+    <a href="#" onclick="tie_resize_height('tie_view_image',480)" title="縦幅が最大480になるようにサイズを変えます"><svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/></g><g><g/><polygon points="13,6.99 16,6.99 12,3 8,6.99 11,6.99 11,17.01 8,17.01 12,21 16,17.01 13,17.01"/></g></svg></a>
+    &nbsp;
+    <!-- view original size -->
+    <a href="#" onclick="tie_view_original_size('tie_view_image','size_area')" id="size_area" title="表示を、オリジナルサイズと適当に縮小したサイズを切り替えます"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm14-2h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zM12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg></a>
+    &nbsp;
+    <style type="text/css">
+    #imagesize_area:hover {
+      text-decoration: none;
+    }
+    #imagetype_area:hover {
+      text-decoration: none;
+    }
+    </style>
+    <!-- image_size -->
+    <a href="#" onclick="tie_image_size('tie_view_image')"  title="現在の表示倍率です。クリックすると1 1.5 2 4 0.5 0.25倍に表示倍率を変更できます" id="imagesize_area" class="font-weight-bold" style="color: #000000 !important;">x1.0</a>
+    &nbsp;
+    <!-- png/jpeg -->
+    <a href="#" onclick="tie_image_type('tie_view_image','imagetype_area')" title="出力ファイルの形式です。クリックすると、PNG/JPGを切り替えられます" id="imagetype_area" class="font-weight-bold" style="color: #000000 !important;">PNG</a>
+    &nbsp;
+    <!-- file download -->
+    <a href="#" onclick="tie_image_download('tie_view_image','image_download')" title="画像をダウンロードします"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zM12 17.5L6.5 12H10v-2h4v2h3.5L12 17.5zM5.12 5l.81-1h12l.94 1H5.12z"/></svg></a>
+    <a id="image_download" class="d-none"></a>
+    &nbsp;
+    <!-- copy to clipboard -->
+    <a href="#" onclick="tie_image_to_clipbard('tie_view_image')" title="クリップボードへコピー"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/></svg></a>
+    &nbsp;
+    <!-- change line color -->
+    <a class="pickr-container" id="tie_pickr" title="描画色を選択します"　style="background-color: rgb(255,255,255);">
+      <button id="tie_pickr_button" width="24" style="background-color: rgb(255,0,0);">
+        &nbsp;
+      </button>
+    </a>
+    <div id="tie_pickr_dummy" class="d-none"></div>
+  </div>
+  <canvas id="tie_view_image" width="1" height="1" onmousedown="tie_on_mousedown(event);" onmousemove="tie_on_mousemove(event);" onmouseup="tie_on_mouseup(event);"></canvas>
+  <textarea id="tie_text_box" class="d-none" style="position: absolute;resize: none;overflow: hidden; border: none;padding: 0;outline: none; -webkit-box-shadow: none; -moz-box-shadow: none;box-shadow: none;" wrap="off"></textarea>
+  <div id="tie_text_tools" class="d-none bg-info" style="position: absolute;">
+    <!-- font size up -->
+    <a href="#" onclick="tie_text_size_up()" title="文字を大きくします"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 4v3h5v12h3V7h5V4H9zm-6 8h3v7h3v-7h3V9H3v3z"/></svg></a>
+    &nbsp;
+    <!-- font size down -->
+    <a href="#" onclick="tie_text_size_down()" title="文字を小さくします"><svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/></g><g><g><g><path d="M2.5,4v3h5v12h3V7h5V4H2.5z M21.5,9h-9v3h3v7h3v-7h3V9z"/></g></g></g></svg></a>
+    &nbsp;
+    <!-- OK -->
+    <a href="#" onclick="tie_text_write($('#tie_pickr_button').css('background-color'))" title="文字入力を確定します"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></a>
+    &nbsp;
+    <!-- cancel -->
+    <a href="#" onclick="tie_text_cancel()" title="文字入力をキャンセルします"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg></a>
+  </div>
+<script>
+  var tie_pickr_config = {
+    theme: 'nano',
+    swatches: [
+      'rgba(255, 0, 0, 1)',
+      'rgba(255, 0, 0, 0.8)',
+      'rgba(0, 0, 0, 1)',
+      'rgba(244, 67, 54, 1)',
+      'rgba(233, 30, 99, 0.95)',
+      'rgba(156, 39, 176, 0.9)',
+      'rgba(103, 58, 183, 0.85)',
+      'rgba(63, 81, 181, 0.8)',
+      'rgba(33, 150, 243, 0.75)',
+      'rgba(3, 169, 244, 0.7)'
+    ],
+
+    defaultRepresentation: 'HEXA',
+
+    components: {
+        preview: true,
+        opacity: true,
+        hue: true,
+
+        interaction: {
+          hex: false,
+          rgba: false,
+          hsva: false,
+          input: true,
+          clear: true,
+          save: true
+        }
+    }
+  };
+  var tie_pickr = null;
+  (function picker_start(){
+    $("#tie_pickr_button")[0].addEventListener('click', function() {
+      if (tie_pickr) {
+        tie_pickr.destroyAndRemove()
+      }
+      var el = document.createElement('p')
+      $("#tie_pickr_dummy").append(el)
+      tie_pickr_config.el = el
+      tie_pickr_config.default = $("#tie_pickr_button").css("background-color")
+      tie_pickr = new Pickr(tie_pickr_config)
+      tie_pickr.on('init', function(instance){
+        instance.show()
+      }).on('save', function(color, instance){
+        $("#tie_pickr_button").css("background-color",color.toRGBA())
+        instance.hide()
+      });
+    })
+  })();
+
+
+  var tie_icons = {
+    fullsize: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12.01 5.5L10 8h4l-1.99-2.5zM18 10v4l2.5-1.99L18 10zM6 10l-2.5 2.01L6 14v-4zm8 6h-4l2.01 2.5L14 16zm7-13H3c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h18c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 16.01H3V4.99h18v14.02z"/></svg>',
+    autosize: '<svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M5 15H3v4c0 1.1.9 2 2 2h4v-2H5v-4zM5 5h4V3H5c-1.1 0-2 .9-2 2v4h2V5zm14-2h-4v2h4v4h2V5c0-1.1-.9-2-2-2zm0 16h-4v2h4c1.1 0 2-.9 2-2v-4h-2v4zM12 9c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg>',
+  }
+  var tie_data = {}
+  var tie_mouse_start_x = 0
+  var tie_mouse_start_y = 0
+  var tie_stack_images = []
+  function tie_on_mousedown(event){
+    event.preventDefault()
+    tie_cancel()
+    var id = event.target.id
+    var rect = event.target.getBoundingClientRect()
+    var key_event = event || window.event
+    var key_shift = (key_event.shiftKey)
+    var key_ctrl = (key_event.ctrlKey)
+    var key_alt = (key_event.altKey)
+    var key_meta = (key_event.metaKey)
+    tie_data[id].mouse_x = event.clientX - rect.left
+    tie_data[id].mouse_y = event.clientY - rect.top
+    tie_data[id].on_mouse = true
+    if (key_ctrl || key_meta){
+      if (key_shift){
+        tie_data[id].mouse_type = 'arrow'        
+      }else{
+        tie_data[id].mouse_type = 'circle'        
+      }
+    }else{
+      if (key_shift){
+        tie_data[id].mouse_type = 'line'
+      }else{
+        tie_data[id].mouse_type = 'box'
+      }
+    }
+    tie_data[id].ctx.strokeStyle = 'rgba(255,0,0,0.5)'
+    tie_data[id].ctx.fillStyle = 'rgb(0,0,0)'
+    tie_data[id].ctx.lineWidth = 2
+  }
+  function tie_on_mousemove(event){
+    event.preventDefault()
+    var id = event.target.id
+    if (tie_data[id] == null || tie_data[id].on_mouse == false){
+      return
+    }
+    var rect = event.target.getBoundingClientRect()
+    var x = event.clientX - rect.left
+    var y = event.clientY - rect.top
+    tie_draw_box(id,x,y)
+  }
+  function tie_on_mouseup(event){
+    event.preventDefault()
+    var id = event.target.id
+    if (tie_data[id] == null || tie_data[id].on_mouse == false){
+      return
+    }
+    tie_data[id].on_mouse = false
+    var rect = event.target.getBoundingClientRect()
+    tie_data[id].mouse_ex = event.clientX - rect.left
+    tie_data[id].mouse_ey = event.clientY - rect.top
+    if (tie_data[id].mouse_ex == tie_data[id].mouse_x && tie_data[id].mouse_ey == tie_data[id].mouse_y){
+      // DO NOTHING
+    }else{
+      $("#tie_id").val(id)
+      $("#tie_menu")[0].style.left = event.pageX + "px"
+      $("#tie_menu")[0].style.top = event.pageY + "px"
+      $("#tie_menu").removeClass("d-none")
+    }
+  }
+  function tie_xywh_size(){
+    var id = $("#tie_id").val()
+    var ex = tie_data[id].mouse_ex
+    var ey = tie_data[id].mouse_ey
+    var sx = tie_data[id].mouse_x
+    var sy = tie_data[id].mouse_y
+    var x,y,w,h
+    if (sx < ex){
+      x = sx
+      w = ex-sx
+    }else if (sx == ex){
+      x = w = 0
+    }else{
+      x = ex
+      w = sx-ex
+    }
+    if (sy < ey){
+      y = sy
+      h = ey-sy
+    }else if (sy == ey){
+      y = h = 0
+    }else{
+      y = ey
+      h = sy-ey
+    }
+    var rect = $("#"+id)[0].getBoundingClientRect()
+    return {id:id,x:x,y:y,w:w,h:h,sx:sx,sy:sy,ex:ex,ey:ey,screenX:x + rect.left,screenY: y+rect.top}
+  }
+  function tie_cut_image(){
+    var sz = tie_xywh_size()
+    if (sz.w > 0 && sz.h > 0){
+      tie_cut_area(sz.id,sz.x,sz.y,sz.w,sz.h)
+    }
+    tie_cancel()
+  }
+  function tie_pen(size,color){
+    var sz = tie_xywh_size()
+    if (sz.w > 0 && sz.h > 0){
+      var cv = document.createElement('canvas')
+      var simg = tie_data[sz.id].imgs[tie_data[sz.id].imgs.length-1]
+      var d = simg.width/tie_data[sz.id].canvas.width
+      cv.width = simg.width
+      cv.height = simg.height
+      var ctx = cv.getContext("2d")
+      ctx.drawImage(simg,0,0)
+      ctx.strokeStyle = color
+      ctx.lineWidth = size
+      if (tie_data[sz.id].mouse_type == 'box'){
+        var r = 8
+        ctx.beginPath()
+        var x = Math.floor(sz.x * d)
+        var y = Math.floor(sz.y * d)
+        var w = Math.floor(sz.w * d)
+        var h = Math.floor(sz.h * d)
+        ctx.moveTo(x,y + r)
+        ctx.arc(x+r,y+h-r,r ,Math.PI,Math.PI*0.5,true)
+        ctx.arc(x+w-r,y+h-r,r ,Math.PI*0.5,0,1)
+        ctx.arc(x+w-r,y+r,r,0,Math.PI*1.5,1)
+        ctx.arc(x+r,y+r,r,Math.PI*1.5,Math.PI,1)
+        ctx.closePath()
+        ctx.stroke()
+      }else if (tie_data[sz.id].mouse_type == 'line'){
+        ctx.beginPath()
+        ctx.moveTo(sz.sx*d,sz.sy*d)
+        ctx.lineTo(sz.ex*d,sz.ey*d)
+        ctx.stroke()
+      }else if (tie_data[sz.id].mouse_type == 'arrow'){
+        if (ctx.strokeStyle.match(/^rgba\s*\(/) != null){
+          // delete alpha
+          ctx.strokeStyle = ctx.strokeStyle.replace(/\,\s*[0-9\.]+\s*\)\s*$/,',1)')
+        }
+        if (ctx.strokeStyle.match(/^\#[0-9A-Fa-f]{8}$/) != null){
+          // delete alpha
+          ctx.strokeStyle = ctx.strokeStyle.substring(0,7)
+        }
+        var x = sz.ex * d
+        var y = sz.ey * d
+        var sx = sz.sx * d
+        var sy = sz.sy * d
+        var l = 30 + size*2
+        var ml = Math.sqrt(Math.abs(sx - x) * Math.abs(sx - x) + Math.abs(sy - y) * Math.abs(sy - y))
+        var s = - 45 * Math.PI/180
+        if (sx < x){
+          s = Math.atan((sy - y)/(sx - x)) - 45 * Math.PI/180
+        }else{
+          s = Math.atan((sy - y)/(sx - x)) - (180+45) * Math.PI/180
+        }
+        if (l > ml/3){
+          l = ml/3
+        }
+        var xp = size/2
+        //if (sx > x){
+        //  xp = -xp+1
+        //}
+        var yp = size/2
+        //if (sy > y){
+        //  yp = -yp+1
+        //}
+        ctx.beginPath()
+        ctx.moveTo(sx,sy)
+        ctx.lineTo(x,y)
+        ctx.stroke()
+        ctx.save()
+        ctx.translate(x,y)
+        ctx.rotate(s)
+        ctx.translate(-(x),-(y))
+        ctx.beginPath()
+        ctx.moveTo(x+xp,y)
+        ctx.lineTo(x-l+xp,y)
+        ctx.moveTo(x,y+yp)
+        ctx.lineTo(x,y-l+yp)
+        ctx.stroke()
+        ctx.restore()
+      }else{
+        ctx.beginPath()
+        ctx.ellipse(
+          (sz.x + sz.w/2) * d,
+          (sz.y + sz.h/2) * d,
+          (sz.w/2) * d,
+          (sz.h/2) * d,
+          0,
+          0,
+          2 * Math.PI
+        )
+        ctx.stroke()
+      }
+      var img = new Image()
+      img.addEventListener("load",function(){
+        tie_data[sz.id].imgs.push(img)
+        tie_clear_redo(sz.id)
+        tie_draw(sz.id)
+      })
+      img.src = cv.toDataURL()
+    }
+    tie_cancel()
+  }
+  function tie_fill(color){
+    var sz = tie_xywh_size()
+    if (sz.w > 0 && sz.h > 0){
+      var cv = document.createElement('canvas')
+      var simg = tie_data[sz.id].imgs[tie_data[sz.id].imgs.length-1]
+      var d = simg.width/tie_data[sz.id].canvas.width
+      cv.width = simg.width
+      cv.height = simg.height
+      var ctx = cv.getContext("2d")
+      ctx.drawImage(simg,0,0)
+      ctx.fillStyle = color
+      if (tie_data[sz.id].mouse_type == 'box' ||
+          tie_data[sz.id].mouse_type == 'line' ||
+          tie_data[sz.id].mouse_type == 'arrow'){
+        ctx.beginPath()
+        ctx.moveTo(sz.x * d,sz.y * d)
+        ctx.lineTo((sz.x + sz.w) * d,sz.y * d)
+        ctx.lineTo((sz.x + sz.w) * d,(sz.y+sz.h) * d)
+        ctx.lineTo((sz.x) * d,(sz.y+sz.h) * d)
+        ctx.lineTo(sz.x * d,sz.y * d)
+        ctx.closePath()
+        ctx.fill()
+      }else{
+        ctx.beginPath()
+        ctx.ellipse(
+          (sz.x + sz.w/2) * d,
+          (sz.y + sz.h/2) * d,
+          (sz.w/2) * d,
+          (sz.h/2) * d,
+          0,
+          0,
+          2 * Math.PI
+        )
+        ctx.fill()
+      }
+      var img = new Image()
+      img.addEventListener("load",function(){
+        tie_data[sz.id].imgs.push(img)
+        tie_clear_redo(sz.id)
+        tie_draw(sz.id)
+      })
+      img.src = cv.toDataURL()
+    }
+    tie_cancel()
+  }
+  function tie_area_mosaic(blocksize){
+    var sz = tie_xywh_size()
+    if (sz.w > 0 && sz.h > 0){
+      var cv = document.createElement('canvas')
+      var simg = tie_data[sz.id].imgs[tie_data[sz.id].imgs.length-1]
+      var d = simg.width/tie_data[sz.id].canvas.width
+      cv.width = simg.width
+      cv.height = simg.height
+      var ctx = cv.getContext("2d")
+      ctx.drawImage(simg,0,0)
+      var idata = ctx.getImageData(0,0,cv.width,cv.height)
+      if (tie_data[sz.id].mouse_type == 'circle'){
+        ctx.beginPath()
+        ctx.ellipse(
+          (sz.x + sz.w/2) * d,
+          (sz.y + sz.h/2) * d,
+          (sz.w/2) * d,
+          (sz.h/2) * d,
+          0,
+          0,
+          2 * Math.PI
+        )
+        ctx.clip()
+      }
+      for (var y = Math.floor(sz.y * d); y < Math.floor((sz.y+sz.h) * d) + blocksize - 1; y += blocksize){
+        for (var x = Math.floor(sz.x * d); x < Math.floor((sz.x+sz.w) * d) + blocksize - 1; x += blocksize){
+          var cr = idata.data[(y * cv.width + x) * 4]
+          var cg = idata.data[(y * cv.width + x) * 4 + 1]
+          var cb = idata.data[(y * cv.width + x) * 4 + 2]
+          ctx.fillStyle = "rgb("+cr+","+cg+","+cb+")"
+          var xsize = blocksize
+          if ( x + xsize > (sz.x + sz.w)*d){
+            xsize = blocksize - ((sz.x + sz.w)*d - x)
+          }
+          if ( x + xsize > cv.width){
+            xsize = cv.width - x
+          }
+          var ysize = blocksize
+          if ( y + ysize > (sz.y + sz.h)*d){
+            ysize = blocksize - ((sz.y + sz.h)*d - y)
+          }
+          if ( y + ysize > cv.height){
+            ysize = cv.height - y
+          }
+          ctx.fillRect(x, y, xsize+1, ysize+1)
+        }
+      }
+      var img = new Image()
+      img.addEventListener("load",function(){
+        tie_data[sz.id].imgs.push(img)
+        tie_clear_redo(sz.id)
+        tie_draw(sz.id)
+      })
+      img.src = cv.toDataURL()
+    }
+    tie_cancel()
+  }
+  function tie_area_blur(zoom){
+    var sz = tie_xywh_size()
+    if (sz.w > 0 && sz.h > 0){
+      var cv = document.createElement('canvas')
+      var simg = tie_data[sz.id].imgs[tie_data[sz.id].imgs.length-1]
+      var d = simg.width/tie_data[sz.id].canvas.width
+      cv.width = simg.width
+      cv.height = simg.height
+      var ctx = cv.getContext("2d")
+      ctx.drawImage(simg,0,0)
+
+      var subcv = document.createElement('canvas')
+      subcv.width = simg.width + zoom * 4
+      subcv.height = simg.height + zoom * 4
+      var subctx = subcv.getContext("2d")
+      subctx.fillStyle = "rgb(255,255,255)"
+      subctx.filter = 'blur(' + zoom + 'px)';
+      subctx.fillRect(0,0,subcv.width,subcv.height)
+      subctx.drawImage(simg,0,0,simg.width,simg.height,zoom*2,zoom*2,simg.width,simg.height)
+
+      if (tie_data[sz.id].mouse_type == 'circle'){
+        ctx.beginPath()
+        ctx.ellipse(
+          (sz.x + sz.w/2) * d,
+          (sz.y + sz.h/2) * d,
+          (sz.w/2) * d,
+          (sz.h/2) * d,
+          0,
+          0,
+          2 * Math.PI
+        )
+        ctx.clip()
+      }else{
+        ctx.beginPath()
+        ctx.rect(sz.x * d,sz.y * d,sz.w * d,sz.h * d)
+        ctx.clip()
+      }
+      ctx.drawImage(
+        subcv,
+        zoom*2,zoom*2,simg.width,simg.height,
+        0,0,simg.width,simg.height,
+      )
+      var img = new Image()
+      img.addEventListener("load",function(){
+        tie_data[sz.id].imgs.push(img)
+        tie_clear_redo(sz.id)
+        tie_draw(sz.id)
+      })
+      img.src = cv.toDataURL()
+    }
+    tie_cancel()
+  }
+  function tie_undo(id){
+    if (tie_data[id] == null){
+      return
+    }
+    if (tie_data[id].imgs.length > 1){
+      tie_data[id].redo_imgs.push(tie_data[id].imgs.pop())
+    }
+    tie_draw(id)
+    tie_cancel()
+  }
+  function tie_redo(id){
+    if (tie_data[id] == null){
+      return
+    }
+    if (tie_data[id].redo_imgs.length > 0){
+      tie_data[id].imgs.push(tie_data[id].redo_imgs.pop())
+    }
+    tie_draw(id)
+    tie_cancel()
+  }
+  function tie_clear_redo(id){
+    tie_data[id].redo_imgs = []
+  }
+  function tie_circle_rand_line(mincount,color){
+    var sz = tie_xywh_size()
+    var cv = document.createElement('canvas')
+    var simg = tie_data[sz.id].imgs[tie_data[sz.id].imgs.length-1]
+    var h = simg.naturalHeight
+    var w = simg.naturalWidth
+    var dparam = simg.width/tie_data[sz.id].canvas.width
+    cv.width = w
+    cv.height = h
+    var ctx = cv.getContext("2d")
+    ctx.drawImage(simg,0,0,w,h)
+
+    var circle_pos = function (d,r,cx,cy){
+      return {x: (Math.cos(d * Math.PI / 180 ) * r + cx), y: (Math.sin(d * Math.PI / 180) * r + cy)}
+    }
+    var irand = function(min,max){
+      return Math.floor(Math.random() * (max - min)) + min
+    }
+    var cnt = irand(mincount,mincount*2+100)
+    var cx = (sz.x + sz.w/2)*dparam
+    var cy = (sz.y + sz.h/2)*dparam
+    var r = sz.w*dparam
+    if (r < sz.h*dparam){
+      r = sz.h*dparam
+    }
+    var rmax = h*2 *dparam
+    if (rmax < w*2 *dparam){
+      rmax = w*2 *dparam
+    }
+    //rmax += 100
+    for (var i=0;i<cnt;i++){
+      var d = irand(0,360)
+      var s = irand(1,1500)/1000
+      var rd = irand(-100*r/3,100*r/10)/100
+      var pt = circle_pos(d,r+rd,cx,cy)
+      var st = circle_pos(d,rmax,cx,cy)
+      var ed = circle_pos(d+s,rmax,cx,cy)
+      ctx.beginPath()
+      ctx.lineWidth = 1
+      ctx.fillStyle = color
+      ctx.strokeStyle = 'rgba(0,0,0,0)'
+      ctx.moveTo(st.x, st.y)
+      ctx.lineTo(pt.x, pt.y)
+      ctx.lineTo(ed.x, ed.y)
+      //ctx.lineTo(st.x, st.y)
+      ctx.closePath()
+      ctx.fill()
+      //ctx.stroke()
+    }
+
+    var img = new Image()
+    img.addEventListener("load",function(){
+      tie_data[sz.id].imgs.push(img)
+      tie_clear_redo(sz.id)
+      tie_draw(sz.id)
+      tie_cancel()
+    })
+    img.src = cv.toDataURL()            
+  }
+  function tie_write_text(area,box){
+    var id = $("#tie_id").val()
+    if (id == ""){
+      return
+    }
+    tie_data[id].text_area_id = area
+    tie_data[id].text_tool_id = box
+    var sz = tie_xywh_size()
+    $("#" + tie_data[id].text_area_id).val("")
+    $("#" + tie_data[id].text_area_id)[0].style.left = (sz.screenX-1) + "px"
+    $("#" + tie_data[id].text_area_id)[0].style.top = (sz.screenY-1) + "px"
+    $("#" + tie_data[id].text_area_id)[0].style.width = (sz.w+2) + "px"
+    $("#" + tie_data[id].text_area_id)[0].style.height = (sz.h+2) + "px"
+    $("#" + tie_data[id].text_area_id).css('font-family','sans-serif')
+    $("#" + tie_data[id].text_area_id).removeClass("d-none")
+    $("#" + tie_data[id].text_tool_id)[0].style.left = $("#tie_menu")[0].style.left
+    $("#" + tie_data[id].text_tool_id)[0].style.top = $("#tie_menu")[0].style.top
+    $("#" + tie_data[id].text_tool_id).removeClass("d-none")
+    if (!$("#tie_menu").hasClass("d-none")){
+      $("#tie_menu").addClass("d-none")
+    }
+    // Hahaha!
+    setTimeout(function(){
+      $("#" + tie_data[id].text_area_id)[0].focus()
+    },100);
+  }
+  function tie_text_size_up(){
+    var id = $("#tie_id").val()
+    if (id == ""){
+      return
+    }
+    var csize = parseInt($("#" + tie_data[id].text_area_id).css('font-size')) + 2
+    $("#" + tie_data[id].text_area_id).css('font-size',csize)
+  }
+  function tie_text_size_down(){
+    var id = $("#tie_id").val()
+    if (id == ""){
+      return
+    }
+    var csize = parseInt($("#" + tie_data[id].text_area_id).css('font-size')) - 2
+    $("#" + tie_data[id].text_area_id).css('font-size',csize)
+  }
+  function tie_text_write(color){
+    var id = $("#tie_id").val()
+    if (id == ""){
+      return
+    }
+    if (tie_data[id] == null){
+      return
+    }
+    var sz = tie_xywh_size()
+    var cv = document.createElement('canvas')
+    var simg = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var h = simg.naturalHeight
+    var w = simg.naturalWidth
+    var d = simg.width/tie_data[id].canvas.width
+    cv.width = w
+    cv.height = h
+    var ctx = cv.getContext("2d")
+    ctx.drawImage(simg,0,0)
+    var fontsz = Math.floor(parseInt($("#" + tie_data[id].text_area_id).css('font-size')) * d)
+    var font = $("#" + tie_data[id].text_area_id).css('font-size').replace(/^[0-9]+/,'')
+    ctx.font = "" + fontsz + font + ' sans-serif'
+    ctx.textAlign = 'start'
+    ctx.textBaseline = 'top'
+    ctx.beginPath()
+    ctx.moveTo(sz.x * d,sz.y * d)
+    ctx.lineTo((sz.x + sz.w) * d,sz.y * d)
+    ctx.lineTo((sz.x + sz.w) * d,(sz.y+sz.h) * d)
+    ctx.lineTo((sz.x) * d,(sz.y+sz.h) * d)
+    ctx.lineTo(sz.x * d,sz.y * d)
+    //ctx.closePath()
+    ctx.clip()
+    ctx.fillStyle = color
+    ctx.fillText(
+      $("#" + tie_data[id].text_area_id).val(),
+      Math.floor(sz.x * d),
+      Math.floor(sz.y * d)
+    )
+    var img = new Image()
+    img.addEventListener("load",function(){
+      tie_data[id].imgs.push(img)
+      tie_clear_redo(id)
+      tie_draw(id)
+      tie_text_cancel()
+    })
+    img.src = cv.toDataURL()
+  }
+  function tie_text_cancel(){
+    tie_cancel()
+  }
+  function tie_cancel(){
+    var id = $("#tie_id").val()
+    $("#tie_id").val("")
+    if (!$("#tie_menu").hasClass("d-none")){
+      $("#tie_menu").addClass("d-none")
+    }
+    if (id != ""){
+      if (tie_data[id] != null){
+        if (tie_data[id].text_area_id != null){
+          if (!$("#" + tie_data[id].text_area_id).hasClass("d-none")){
+            $("#" + tie_data[id].text_area_id).addClass("d-none")
+          }
+        }
+        if (tie_data[id].text_tool_id != null){
+          if (!$("#" + tie_data[id].text_tool_id).hasClass("d-none")){
+            $("#" + tie_data[id].text_tool_id).addClass("d-none")
+          }
+        }
+      }
+      tie_draw(id)
+    }
+  }
+  function tie_view_original_size(id,changeid){
+    if (tie_data[id] == null){
+      return
+    }
+    if (tie_data[id].view_original_size){
+      tie_data[id].view_original_size = false
+      $("#" + changeid).html(tie_icons.autosize)
+      tie_data[id].image_size = -1
+    }else{
+      tie_data[id].view_original_size = true
+      $("#" + changeid).html(tie_icons.fullsize)
+      tie_data[id].image_size = -1
+    }
+    tie_draw(id)
+  }
+  function tie_image_type(id,changeid){
+    if (tie_data[id] == null){
+      return
+    }
+    if (tie_data[id].is_png){
+      tie_data[id].is_png = false
+      $("#" + changeid).html('JPG')
+    }else{
+      tie_data[id].is_png = true
+      $("#" + changeid).html('PNG')
+    }
+  }
+  function tie_image_size(id){
+    if (tie_data[id] == null){
+      return
+    }
+    if (tie_data[id].image_size < 0){
+      if (tie_data[id].image_size == -1){
+        tie_data[id].image_size = 1.5
+      }else{
+        tie_data[id].image_size = 1
+      }
+    }else{
+      if (tie_data[id].image_size == 1){
+        tie_data[id].image_size = 1.5
+      }else if (tie_data[id].image_size == 1.5){
+        tie_data[id].image_size = 2
+      }else if (tie_data[id].image_size == 2){
+        tie_data[id].image_size = 4
+      }else if (tie_data[id].image_size == 4){
+        tie_data[id].image_size = 0.5
+      }else if (tie_data[id].image_size == 0.5){
+        tie_data[id].image_size = 0.25
+      }else if (tie_data[id].image_size == 0.25){
+        tie_data[id].image_size = 1
+      }else{
+        tie_data[id].image_size = 1
+      }
+    }
+    tie_draw(id)
+  }
+  function tie_date2string(date){
+    var ret = ""
+    ret += date.getFullYear()
+    ret += ("0" + (date.getMonth()+1)).slice(-2)
+    ret += ("0" + date.getDate()).slice(-2)
+    ret += "_"
+    ret += ("0" + date.getHours()).slice(-2)
+    ret += ("0" + date.getMinutes()).slice(-2)
+    ret += ("0" + date.getSeconds()).slice(-2)
+    return ret
+  }
+  function tie_image_download(id,a_id){
+    if (tie_data[id] == null){
+      return
+    }
+    var a = document.getElementById(a_id)
+    a.href = tie_get_b64_img(id)
+    a.download = "img_" + tie_date2string(new Date()) + "."
+    if (tie_data[id].is_png){
+      a.download += "png"
+    }else{
+      a.download += "jpg"
+    }
+    a.click()
+  }
+  function tie_image_to_clipbard(id){
+    if (tie_data[id] == null){
+      return
+    }
+    var cv = document.createElement('canvas')
+    var simg = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var h = simg.naturalHeight
+    var w = simg.naturalWidth
+    cv.width = w
+    cv.height = h
+    var ctx = cv.getContext("2d")
+    ctx.drawImage(simg,0,0)
+    //var ua = window.navigator.userAgent.toLowerCase()
+    //if (ua.indexOf('firefox') == -1){
+      cv.toBlob(blob => navigator.clipboard.write([new ClipboardItem({'image/png': blob})]))
+    /*}else{
+      document.body.appendChild(simg);
+      var r = document.createRange();
+      r.selectNodeContents(simg);
+      var sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(r);
+      document.execCommand('Copy');
+      sel.removeAllRanges()
+      //document.body.removeChild(simg);
+    }
+    */
+  }
+  function tie_get_b64_img(id){
+    var cv = document.createElement('canvas')
+    var simg = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var h = simg.naturalHeight
+    var w = simg.naturalWidth
+    cv.width = w
+    cv.height = h
+    var ctx = cv.getContext("2d")
+    ctx.drawImage(simg,0,0)
+    if (tie_data[id].is_png){
+      return cv.toDataURL("image/png")
+    }else{
+      return cv.toDataURL("image/jpeg")
+    }
+  }
+  function tie_cut_area(id,x,y,w,h){
+    var cv = document.createElement('canvas')
+    var simg = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    //var d = tie_data[id].image_size * simg.width/tie_data[id].canvas.width
+    var d = simg.width/tie_data[id].canvas.width
+    //if (d < 1){ d = 1 }
+    //if (d < 0) { d = -d }
+    cv.width = Math.floor(w * d)
+    cv.height = Math.floor(h * d)
+    var ctx = cv.getContext("2d")
+    if (tie_data[id].mouse_type == 'circle'){
+      ctx.fillStyle = 'rgba(0,0,0,1)'
+      ctx.fillRect(0,0,cv.width,cv.height)
+      ctx.beginPath()
+      ctx.ellipse(
+        cv.width/2,
+        cv.height/2,
+        cv.width/2,
+        cv.height/2,
+        0,
+        0,
+        2 * Math.PI
+      )
+      ctx.clip()
+    }
+    // if type == line. DO NOTHING
+    // if type == arrow. DO NOTHING
+    ctx.drawImage(simg,Math.floor(x*d),Math.floor(y*d),Math.floor(w*d),Math.floor(h*d),0,0,Math.floor(w*d),Math.floor(h*d))
+    var img = new Image()
+    img.addEventListener("load",function(){
+      tie_data[id].imgs.push(img)
+      tie_clear_redo(id)
+      tie_draw(id)
+    })
+    img.src = cv.toDataURL()
+  }
+  function tie_resize_width(id,width){
+    if (tie_data[id] == null){
+      return
+    }
+    var simg = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var w = simg.naturalWidth
+    if (w > width){
+      tie_resize(id,width/w)
+    }
+  }
+  function tie_resize_height(id,height){
+    if (tie_data[id] == null){
+      return
+    }
+    var simg = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var h = simg.naturalHeight
+    if (h > height){
+      tie_resize(id,height/h)
+    }
+  }
+  function tie_resize(id,zoom){
+    if (tie_data[id] == null){
+      return
+    }
+    var cv = document.createElement('canvas')
+    var simg = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var h = simg.naturalHeight
+    var w = simg.naturalWidth
+    var d = zoom
+    cv.width = Math.floor(w * d)
+    cv.height = Math.floor(h * d)
+    var ctx = cv.getContext("2d")
+    ctx.drawImage(simg,0,0,w,h,0,0,Math.floor(w*d),Math.floor(h*d))
+    var img = new Image()
+    img.addEventListener("load",function(){
+      tie_data[id].imgs.push(img)
+      tie_clear_redo(id)
+      tie_draw(id)
+    })
+    img.src = cv.toDataURL()
+  }
+  function tie_rotate90(id){
+    if (tie_data[id] == null){
+      return
+    }
+    var cv = document.createElement('canvas')
+    var simg = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var h = simg.naturalHeight
+    var w = simg.naturalWidth
+    cv.width = h
+    cv.height = w
+    var ctx = cv.getContext("2d")
+    ctx.save()
+    ctx.clearRect(0, 0, h, w)
+    ctx.translate(h / 2, w / 2)
+    ctx.rotate(-Math.PI/2)
+    ctx.translate(-w / 2, -h / 2)
+    ctx.drawImage(simg,0,0,w,h)
+    ctx.restore()
+    var img = new Image()
+    img.addEventListener("load",function(){
+      tie_data[id].imgs.push(img)
+      tie_clear_redo(id)
+      tie_draw(id)
+    })
+    img.src = cv.toDataURL()
+  }
+  function tie_lr_swap(id){
+    if (tie_data[id] == null){
+      return
+    }
+    var cv = document.createElement('canvas')
+    var simg = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var h = simg.naturalHeight
+    var w = simg.naturalWidth
+    cv.width = w
+    cv.height = h
+    var ctx = cv.getContext("2d")
+    ctx.save()
+    ctx.scale(-1,1)
+    ctx.translate(-w, 0)
+    ctx.drawImage(simg,0,0,w,h)
+    ctx.restore()
+    var img = new Image()
+    img.addEventListener("load",function(){
+      tie_data[id].imgs.push(img)
+      tie_clear_redo(id)
+      tie_draw(id)
+    })
+    img.src = cv.toDataURL()    
+  }
+  function tie_td_swap(id){
+    if (tie_data[id] == null){
+      return
+    }
+    var cv = document.createElement('canvas')
+    var simg = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var h = simg.naturalHeight
+    var w = simg.naturalWidth
+    cv.width = w
+    cv.height = h
+    var ctx = cv.getContext("2d")
+    ctx.save()
+    ctx.scale(1,-1)
+    ctx.translate(0,-h)
+    ctx.drawImage(simg,0,0,w,h)
+    ctx.restore()
+    var img = new Image()
+    img.addEventListener("load",function(){
+      tie_data[id].imgs.push(img)
+      tie_clear_redo(id)
+      tie_draw(id)
+    })
+    img.src = cv.toDataURL()        
+  }
+  function tie_effect_sepia(id){
+    if (tie_data[id] == null){
+      return
+    }
+    var cv = document.createElement('canvas')
+    var simg = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var h = simg.naturalHeight
+    var w = simg.naturalWidth
+    cv.width = w
+    cv.height = h
+    var ctx = cv.getContext("2d")
+    ctx.drawImage(simg,0,0,w,h)
+    var idata = ctx.getImageData(0,0,w,h)
+    for (var y = 0; y < h ; y += 1){
+      for (var x = 0; x < w; x += 1){
+        var cr = idata.data[(y * w + x) * 4]
+        var cg = idata.data[(y * w + x) * 4 + 1]
+        var cb = idata.data[(y * w + x) * 4 + 2]
+        var rgb = parseInt((cr*30+cg*59+cb*11)/100,10)
+        idata.data[(y * w + x) * 4] = parseInt( (rgb/255)*240 )
+        idata.data[(y * w + x) * 4 + 1] = parseInt( (rgb/255)*200 )
+        idata.data[(y * w + x) * 4 + 2] = parseInt( (rgb/255)*145 )
+      }
+    }
+    ctx.putImageData(idata, 0, 0, 0, 0, w, h);
+    var img = new Image()
+    img.addEventListener("load",function(){
+      tie_data[id].imgs.push(img)
+      tie_clear_redo(id)
+      tie_draw(id)
+    })
+    img.src = cv.toDataURL()        
+  }
+  function tie_effect_grayscale(id){
+    if (tie_data[id] == null){
+      return
+    }
+    var cv = document.createElement('canvas')
+    var simg = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var h = simg.naturalHeight
+    var w = simg.naturalWidth
+    cv.width = w
+    cv.height = h
+    var ctx = cv.getContext("2d")
+    ctx.drawImage(simg,0,0,w,h)
+    var idata = ctx.getImageData(0,0,w,h)
+    for (var y = 0; y < h ; y += 1){
+      for (var x = 0; x < w; x += 1){
+        var cr = idata.data[(y * w + x) * 4]
+        var cg = idata.data[(y * w + x) * 4 + 1]
+        var cb = idata.data[(y * w + x) * 4 + 2]
+        var rgb = parseInt((cr*30+cg*59+cb*11)/100,10)
+        idata.data[(y * w + x) * 4] = rgb
+        idata.data[(y * w + x) * 4 + 1] = rgb
+        idata.data[(y * w + x) * 4 + 2] = rgb
+      }
+    }
+    ctx.putImageData(idata, 0, 0, 0, 0, w, h);
+    var img = new Image()
+    img.addEventListener("load",function(){
+      tie_data[id].imgs.push(img)
+      tie_clear_redo(id)
+      tie_draw(id)
+    })
+    img.src = cv.toDataURL()        
+  }
+  function tie_effect_mosaic(id,blocksize){
+    if (tie_data[id] == null){
+      return
+    }
+    var cv = document.createElement('canvas')
+    var simg = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var h = simg.naturalHeight
+    var w = simg.naturalWidth
+    cv.width = w
+    cv.height = h
+    var ctx = cv.getContext("2d")
+    ctx.drawImage(simg,0,0,w,h)
+    var idata = ctx.getImageData(0,0,w,h)
+    for (var y = 0; y < h ; y += blocksize){
+      for (var x = 0; x < w; x += blocksize){
+        var cr = idata.data[(y * w + x) * 4]
+        var cg = idata.data[(y * w + x) * 4 + 1]
+        var cb = idata.data[(y * w + x) * 4 + 2]
+        ctx.fillStyle = "rgb("+cr+","+cg+","+cb+")"
+        ctx.fillRect(x, y, blocksize+1, blocksize+1)
+      }
+    }
+    var img = new Image()
+    img.addEventListener("load",function(){
+      tie_data[id].imgs.push(img)
+      tie_clear_redo(id)
+      tie_draw(id)
+    })
+    img.src = cv.toDataURL()        
+  }
+  function tie_draw_image(id){
+    if (tie_data[id] == null){
+      return
+    }
+    tie_data[id].ctx.fillRect(0,0,tie_data[id].canvas.width,tie_data[id].canvas.height)
+    tie_data[id].ctx.drawImage(tie_data[id].imgs[tie_data[id].imgs.length-1],0,0,tie_data[id].canvas.width,tie_data[id].canvas.height)
+  }
+  function tie_draw_box(id,x,y){
+    if (tie_data[id] == null || tie_data[id].on_mouse == false){
+      return
+    }
+    tie_draw_image(id)
+    var sx = tie_data[id].mouse_x
+    var sy = tie_data[id].mouse_y
+    if (tie_data[id].mouse_type == 'circle'){
+      if (sx == x || sy == y){
+        return
+      }
+      if (sx > x){
+        var t = sx
+        sx =  x
+        x = t
+      }
+      if (sy > y){
+        var t = sy
+        sy =  y
+        y = t
+      }
+      tie_data[id].ctx.beginPath()
+      tie_data[id].ctx.ellipse(
+        sx + (x-sx)/2,
+        sy + (y-sy)/2,
+        (x-sx)/2,
+        (y-sy)/2,
+        0,
+        0,
+        2 * Math.PI
+      )
+      tie_data[id].ctx.stroke()
+    }else if (tie_data[id].mouse_type == 'line'){
+      tie_data[id].ctx.beginPath()
+      tie_data[id].ctx.moveTo(sx,sy)
+      tie_data[id].ctx.lineTo(x,y)
+      tie_data[id].ctx.stroke()
+    }else if (tie_data[id].mouse_type == 'arrow'){
+      var l = 30
+      var ml = Math.sqrt(Math.abs(sx - x) * Math.abs(sx - x) + Math.abs(sy - y) * Math.abs(sy - y))
+      var s = - 45 * Math.PI/180
+      if (sx < x){
+       s = Math.atan((sy - y)/(sx - x)) - 45 * Math.PI/180
+      }else{
+        s = Math.atan((sy - y)/(sx - x)) - (180+45) * Math.PI/180
+      }
+      if (l > ml/3){
+        l = ml/3
+      }
+      tie_data[id].ctx.beginPath()
+      tie_data[id].ctx.moveTo(sx,sy)
+      tie_data[id].ctx.lineTo(x,y)
+      tie_data[id].ctx.stroke()
+      tie_data[id].ctx.save()
+      tie_data[id].ctx.translate(x,y)
+      tie_data[id].ctx.rotate(s)
+      tie_data[id].ctx.translate(-x,-y)
+      tie_data[id].ctx.beginPath()
+      tie_data[id].ctx.moveTo(x,y)
+      tie_data[id].ctx.lineTo(x-l,y)
+      tie_data[id].ctx.moveTo(x,y)
+      tie_data[id].ctx.lineTo(x,y-l)
+      tie_data[id].ctx.stroke()
+      tie_data[id].ctx.restore()
+    }else{
+      tie_data[id].ctx.beginPath()
+      tie_data[id].ctx.moveTo(sx,sy)
+      tie_data[id].ctx.lineTo(x,sy)
+      tie_data[id].ctx.moveTo(x,sy)
+      tie_data[id].ctx.lineTo(x,y)
+      tie_data[id].ctx.moveTo(x,y)
+      tie_data[id].ctx.lineTo(sx,y)
+      tie_data[id].ctx.moveTo(sx,y)
+      tie_data[id].ctx.lineTo(sx,sy)
+      tie_data[id].ctx.stroke()
+    }
+  }
+  function tie_draw_image_originalsize(id){
+    if (tie_data[id] == null){
+      return
+    }
+    var image = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var h = image.naturalHeight
+    var w = image.naturalWidth
+    tie_data[id].canvas.height = h
+    tie_data[id].canvas.width = w
+    tie_data[id].image_size = -1
+    tie_draw_image(id)
+  }
+  function tie_draw_image_autoresize(id){
+    if (tie_data[id] == null){
+      return
+    }
+    var max_height = Math.floor($(window).height()*4/5)
+    var max_width = Math.floor($(window).width()*4/5)
+    var image = tie_data[id].imgs[tie_data[id].imgs.length-1]
+    var h = image.naturalHeight
+    var w = image.naturalWidth
+    if (h > max_height || w > max_width){
+      h = h * max_width/w
+      w = max_width
+      if (h > max_height){
+        w = w * max_height / h
+        h = max_height
+      }
+    }
+    w = Math.floor(w)
+    h = Math.floor(h)
+    tie_data[id].canvas.height = h
+    tie_data[id].canvas.width = w
+    tie_data[id].image_size = -w/image.naturalWidth
+    tie_draw_image(id)
+  }
+  function tie_draw(id){
+    if (tie_data[id] == null){
+      return
+    }
+    var d = 0
+    if (tie_data[id].image_size < 0){
+      if (tie_data[id].view_original_size){
+        tie_draw_image_originalsize(id)
+      }else{
+        tie_draw_image_autoresize(id)
+      }
+      d = -tie_data[id].image_size
+      d = Math.floor(d * 100)/100
+    }else{
+      d = tie_data[id].image_size
+      d = Math.floor(d * 100)/100
+      var image = tie_data[id].imgs[tie_data[id].imgs.length-1]
+      var h = image.naturalHeight
+      var w = image.naturalWidth
+      tie_data[id].canvas.height = h * d
+      tie_data[id].canvas.width = w * d
+      tie_draw_image(id)
+    }
+    $("#" + tie_data[id].image_size_id).text("x" + d)
+  }
+  function tie_draw_url(id,image_size_id,url){
+    var image = new Image();
+    image.addEventListener("load",function(){
+      tie_data[id] = {
+        imgs: [],
+        redo_imgs: [],
+        mouse_x: 0,
+        mouse_y: 0,
+        mouse_ex: 0,
+        mouse_ey: 0,
+        on_mouse: false,
+        mouse_type: 'box',
+        view_original_size: false,
+        is_png: true,
+        image_size: -1,
+        image_size_id: image_size_id,
+        text_area_id: null,
+        text_tool_id: null,
+        canvas: document.getElementById(id),
+        ctx: document.getElementById(id).getContext("2d")
+      }
+      tie_data[id].imgs.push(image)
+      //tie_draw_image_autoresize(id)
+      tie_draw(id)
+    })
+    image.src = url
+  }
+  $('*').pastableNonInputable();
+  $('*').on('pasteImage', function (ev, data){
+    tie_draw_url("tie_view_image",'imagesize_area',data.dataURL)
+  }).on('pasteImageError', function(ev, data){
+    alert('Oops: ' + data.message);
+    if(data.url){
+      alert('But we got its url anyway:' + data.url)
+    }
+  }).on('pasteText', function (ev, data){
+    console.log("text: " + data.text);
+  })
+  function tie_on_dragover(event){
+    event.stopPropagation()
+    event.preventDefault()
+    event.dataTransfer.dropEffect = 'copy'
+  }
+  function tie_on_drop(event){
+    event.stopPropagation()
+    event.preventDefault()
+    tie_load_file('tie_view_image','imagesize_area',event)
+  }
+  function tie_load_file(id,image_size_id,event){
+    var files
+    var reader = new FileReader()
+    if(event.target.files){
+      files = event.target.files
+    }else{
+      files = event.dataTransfer.files
+    }
+    reader.addEventListener('load',function(event){
+      var image = new Image();
+      image.addEventListener("load",function(){
+        tie_data[id] = {
+          imgs: [],
+          redo_imgs: [],
+          mouse_x: 0,
+          mouse_y: 0,
+          mouse_ex: 0,
+          mouse_ey: 0,
+          on_mouse: false,
+          mouse_type: 'box',
+          view_original_size: false,
+          is_ing: true,
+          image_size: -1,
+          image_size_id: image_size_id,
+          text_area_id: null,
+          text_tool_id: null,
+          canvas: document.getElementById(id),
+          ctx: document.getElementById(id).getContext("2d")
+        }
+        tie_data[id].imgs.push(image)
+        tie_draw(id,image)
+      })
+      image.addEventListener("error",function(){
+        alert("*ERROR*\nnot image file")
+      })
+      image.src = reader.result
+    })
+    if (files[0]){
+      reader.readAsDataURL(files[0])
+    }
+  }
+  $('#tie_dragframe')[0].addEventListener('drop',tie_on_drop,false)
+  $('#tie_dragframe')[0].addEventListener('dragover',tie_on_dragover,false)
+  $("#tie_file").on("change",function(event){
+    tie_load_file('tie_view_image','imagesize_area',event)
+  })
+  function tie_inputfile(){
+    $("#tie_file").click()
+  }
+  $(window).resize(function() {
+    tie_draw('tie_view_image')
+  });
+  /*
+  function tie_tartup() {
+    var el = document.getElementById("tie_view_image");
+    el.addEventListener("touchstart", tie_on_mousedown, false);
+    el.addEventListener("touchend", tie_on_mouseup, false);
+    el.addEventListener("touchcancel", tie_on_mouseup, false);
+    el.addEventListener("touchmove", tie_on_mousemove, false);
+  }
+  document.addEventListener("DOMContentLoaded", tie_tartup);
+  */
+</script>
+</body>
+</html>
