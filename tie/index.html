@@ -15,6 +15,7 @@
 <link rel="stylesheet" href="css/pickr-nano.min.css">
 <script src="js/pickr.min.js"></script>
 <script src="js/pickr.es5.min.js"></script>
+<script src="js/fontfamily_list.js"></script>
 
 </head>
 <body>
@@ -136,11 +137,22 @@
     <!-- font size down -->
     <a href="#" onclick="tie_text_size_down()" title="文字を小さくします"><svg xmlns="http://www.w3.org/2000/svg" enable-background="new 0 0 24 24" height="24" viewBox="0 0 24 24" width="24"><g><rect fill="none" height="24" width="24"/></g><g><g><g><path d="M2.5,4v3h5v12h3V7h5V4H2.5z M21.5,9h-9v3h3v7h3v-7h3V9z"/></g></g></g></svg></a>
     &nbsp;
+    <!-- font change -->
+    <a href="#" onclick="tie_text_font_change()" title="フォントを変更します"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 0 24 24" width="24px" fill="#000000"><path d="M0 0h24v24H0z" fill="none"/><path d="M5 17v2h14v-2H5zm4.5-4.2h5l.9 2.2h2.1L12.75 4h-1.5L6.5 15h2.1l.9-2.2zM12 5.98L13.87 11h-3.74L12 5.98z"/></svg></a>
+    &nbsp;
     <!-- OK -->
     <a href="#" onclick="tie_text_write($('#tie_pickr_button').css('background-color'))" title="文字入力を確定します"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M9 16.2L4.8 12l-1.4 1.4L9 19 21 7l-1.4-1.4L9 16.2z"/></svg></a>
     &nbsp;
     <!-- cancel -->
     <a href="#" onclick="tie_text_cancel()" title="文字入力をキャンセルします"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M12 2C6.47 2 2 6.47 2 12s4.47 10 10 10 10-4.47 10-10S17.53 2 12 2zm5 13.59L15.59 17 12 13.41 8.41 17 7 15.59 10.59 12 7 8.41 8.41 7 12 10.59 15.59 7 17 8.41 13.41 12 17 15.59z"/></svg></a>
+  </div>
+  <div id="tie_text_tools_font" class="d-none bg-info" style="position: absolute;">
+    <div class="list-group" id="tie_text_tools_font_list">
+      <a href="#" class="list-group-item list-group-item-action active" aria-current="true">
+        The current link item
+      </a>
+      <a href="#" class="list-group-item list-group-item-action">A second link item</a>
+    </div>
   </div>
 <script>
   var tie_pickr_config = {
@@ -677,6 +689,35 @@
     }
     var csize = parseInt($("#" + tie_data[id].text_area_id).css('font-size')) - 2
     $("#" + tie_data[id].text_area_id).css('font-size',csize)
+  }
+  function tie_text_font_change(){
+    var flist = $("#tie_text_tools_font_list")
+    flist.innerHTML = "";
+    var currentFont = "";
+    var html = ""
+    html += '<a href="#" class="list-group-item list-group-item-action active" onclick="tie_text_font_set(\'\')">フォントを変更しない</a>'
+    for(var i=0;i<fontfamily_list.length;i++){
+      var name = fontfamily_list[i].name
+      html += '<a href="#" class="list-group-item list-group-item-action" onclick="tie_text_font_set(\'' + name + '\')">' + name + '</a>'
+    }
+    flist.innerHTML = html
+    var id = $("#tie_id").val()
+    if (id == ""){
+      return
+    }
+    $("#tie_text_tools_font")[0].style.left = $("#" + tie_data[id].text_tool_id)[0].style.left
+    $("#tie_text_tools_font")[0].style.top = $("#" + tie_data[id].text_tool_id)[0].style.top + $("#" + tie_data[id].text_tool_id)[0].style.height + 1
+    $("#tie_text_tools_font").removeClass("d-none")
+  }
+  function tie_text_font_set(fontname){
+    var id = $("#tie_id").val()
+    if (id == ""){
+      return
+    }
+    if (fontname != ""){
+      $("#" + tie_data[id].text_area_id).css('font-family',fontname)
+    }
+    $("#tie_text_tools_font").addClass("d-none")
   }
   function tie_text_write(color){
     var id = $("#tie_id").val()
