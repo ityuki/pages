@@ -1581,9 +1581,30 @@ if (typeof exports === 'object') {
 
         var md = '';
 
+        var href = $.md.mainHref
+
+        var href_ary = href.split('/')
+        var href_d = []
+        for (var i=0;i<href_ary.length;i++){
+            var s = href_ary[i]
+            if (s == "" || s == ".") continue
+            if (s == ".."){
+                if (href_d.length > 0){
+                    href_d.pop()
+                }
+                continue
+            }
+            href_d.push(s)
+        }
+        if (href_d.lenth < 1){
+            href = "index.md"
+        }else{
+            href = "./" + href_d.join("/")
+        }
+
         $.md.stage('init').subscribe(function(done) {
             var ajaxReq = {
-                url: $.md.mainHref,
+                url: href,
                 dataType: 'text'
             };
             $.ajax(ajaxReq).done(function(data) {
@@ -1657,7 +1678,10 @@ if (typeof exports === 'object') {
             var $el = $(e);
             var href = $el.attr('href');
             var text = $el.toptext();
+            $html.insertAfter($el.parents('p'));
+            $el.remove();
 
+            /*
             $.ajax({
                 url: href,
                 dataType: 'text'
@@ -1678,6 +1702,7 @@ if (typeof exports === 'object') {
             }).always(function () {
                 latch.countDown();
             });
+            */
         });
     }
 
