@@ -15,7 +15,7 @@
 
 ### 読み込み
 
-```
+```html
 <head>
  <script src="fontfamily_list.js" type="text/javascript" charset="UTF-8" ></script>
 </head>
@@ -23,7 +23,7 @@
 
 ### 使用
 
-```
+```html
   window.addEventListener('fontfamily-loaded',function(){
     var w = document.getElementById("data")
     var d = ""
