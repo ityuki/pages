@@ -21,4 +21,12 @@
 使い方？　習うより慣れろ！！
 
 
+### [FontFamily List](/fontfamily-list/sample.html)
 
+簡易画像編集君で使ってる、使えそうなフォント一覧をゲットするプログラムのサンプルページ
+
+中身は[これ](https://github.com/ityuki/fontfamily-list)
+
+時々、嘘の報告を返してくるが、修正するつもりはあまりない
+
+ほぼ日本語＆英語圏専用
