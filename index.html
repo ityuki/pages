@@ -284,7 +284,7 @@ block.normal = merge({}, block);
  */
 
 block.gfm = merge({}, block.normal, {
-  fences: /^ *(`{3,}|~{3,}) *(\S*) *\n([\s\S]+?)\n\s*\1 *(?:\n+|$)/,
+  fences: /^ *(`{3,}|~{3,}) *(\S+)? *\n([\s\S]+?)\s*\1 *(?:\n+|$)/,
   paragraph: /^/
 });
 
@@ -310,8 +310,6 @@ function Lexer(options) {
   this.tokens.links = {};
   this.options = options || marked.defaults;
   this.rules = block.normal;
-
-  return
 
   if (this.options.gfm) {
     if (this.options.tables) {
@@ -394,9 +392,11 @@ Lexer.prototype.token = function(src, top) {
     // fences (gfm)
     if (cap = this.rules.fences.exec(src)) {
       src = src.substring(cap[0].length);
+      var lang = cap[2]
+      if (RegExp("^html$","i").test(lang)) lang = ""
       this.tokens.push({
         type: 'code',
-        lang: cap[2],
+        lang: lang,
         text: cap[3]
       });
       continue;
@@ -1250,7 +1250,7 @@ function marked(src, opt, callback) {
       , pending = 0
       , l = tokens.length
       , i = 0;
-
+    
     if (!highlight || highlight.length < 3) {
       return callback(null, Parser.parse(tokens, opt));
     }
