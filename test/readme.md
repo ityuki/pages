@@ -15,12 +15,32 @@
 
 ### 読み込み
 
-```html
+```
 <head>
  <script src="fontfamily_list.js" type="text/javascript" charset="UTF-8" ></script>
 </head>
 ```
 
+### 使用
+
+```
+  window.addEventListener('fontfamily-loaded',function(){
+    var w = document.getElementById("data")
+    var d = ""
+    for(var i=0;i<fontfamily_list.length;i++){
+        var fontfamily = fontfamily_list[i]
+        d += fontfamily.name
+        d += " : "
+        for (var key in fontfamily.lang){
+            d += key
+            d += "="
+            d += fontfamily.lang[key]
+            d += "<br>"
+        }
+    }
+    w.innerHTML = d
+  });
+```
 
 ## ライセンス
 * 本プログラムは、MIT Licenseです
