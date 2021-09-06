@@ -311,7 +311,8 @@ function Lexer(options) {
   this.options = options || marked.defaults;
   this.rules = block.normal;
 
-  /*
+  return
+
   if (this.options.gfm) {
     if (this.options.tables) {
       this.rules = block.tables;
@@ -319,8 +320,6 @@ function Lexer(options) {
       this.rules = block.gfm;
     }
   }
-  */
-  this.rules = block.tables;
 }
 
 /**
